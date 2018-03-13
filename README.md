@@ -1,7 +1,17 @@
 capstone
 ==============================
 
-A short description of the project.
+This is a python3 project. If it's not your default python, use python3 for the below commands.
+
+GETTING STARTED:
+ * make requirements <- install dependencies
+ * open a python interpreter and run import nltk; nltk.download() and fetch all corpora
+
+To clean the data
+python src/data/make_dataset.py
+
+To build the LDA topics
+python src/features/build_features.py
 
 Project Organization
 ------------
