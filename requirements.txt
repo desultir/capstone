@@ -1,4 +1,6 @@
 click
+gensim
+pandas
 Sphinx
 coverage
 awscli
