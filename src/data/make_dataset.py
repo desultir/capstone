@@ -42,24 +42,24 @@ def main(input_filepath='../data/raw', output_filepath='../data/processed', by_l
         from geolocation.main import GoogleMaps
         if geocode:
             df1=pd.read_csv(os.path.join(input_filepath, "tweet.csv"),header=0)
-            gm = GoogleMaps(api_key='#FILLMEOUT')
+            gm = GoogleMaps(api_key='AIzaSyDa2sPaP397vWB4KcnyRo13pK5oqRWFzEk')
         
             df = df1[['location', 'lat','lng','text']]
-            i = 0
             def geocode(df):
-                if i < 2400 and pd.notnull(df['lat']) and pd.notnull(df['lng']):
-                    i += 1
-                    location = gm.search(lat=df['lat'], lng=df['lng'])).first()
+                if geocode.calls < 2400 and pd.notnull(df['lat']) and pd.notnull(df['lng']):
+                    geocode.calls += 1
+                    location = gm.search(lat=df['lat'], lng=df['lng']).first()
                     for area in location.administrative_area:
                         if area.area_type =='administrative_area_level_2':
                             df['lga'] = area.name
 
                     df['postal_code'] = location.postal_code
                     df['city'] = location.city
-                    if i % 50 == 0:
+                    if geocode.calls % 50 == 0:
                         #ratelimit
                         print(".")
                         time.sleep(1)
+            geocode.calls = 0
             df['location'] = df.apply(geocode, axis=1)
         else:
             df1=pd.read_csv(os.path.join(input_filepath, "geocoded-tweet.csv"),header=0)
