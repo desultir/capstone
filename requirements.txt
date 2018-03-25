@@ -1,5 +1,6 @@
 click
 pyshp
+shapely
 xlrd
 nltk
 sklearn

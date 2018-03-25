@@ -20,10 +20,9 @@ from dotenv import find_dotenv, load_dotenv
 
 @click.command()
 @click.option('--by-location/--no-location', default=False)
-@click.option('--geocode/--no-geocode', default=False)
 @click.argument('input_filepath', type=click.Path(exists=True), default='./data/raw')
 @click.argument('output_filepath', type=click.Path(), default='./data/processed')
-def main(input_filepath='../data/raw', output_filepath='../data/processed', by_location=False, geocode=False):
+def main(input_filepath='../data/raw', output_filepath='../data/processed', by_location=False):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
         check
@@ -40,30 +39,7 @@ def main(input_filepath='../data/raw', output_filepath='../data/processed', by_l
         df2.to_csv(os.path.join(output_filepath, "poster_docs.csv"))
     else:
         #geolocate
-        from geolocation.main import GoogleMaps
-        if geocode:
-            df1=pd.read_csv(os.path.join(input_filepath, "tweet.csv"),header=0)
-            gm = GoogleMaps(api_key='AIzaSyDa2sPaP397vWB4KcnyRo13pK5oqRWFzEk')
-        
-            df = df1[['location', 'lat','lng','text']]
-            def geocode(df):
-                if geocode.calls < 2400 and pd.notnull(df['lat']) and pd.notnull(df['lng']):
-                    geocode.calls += 1
-                    location = gm.search(lat=df['lat'], lng=df['lng']).first()
-                    for area in location.administrative_area:
-                        if area.area_type =='administrative_area_level_2':
-                            df['lga'] = area.name
-
-                    df['postal_code'] = location.postal_code
-                    df['city'] = location.city
-                    if geocode.calls % 50 == 0:
-                        #ratelimit
-                        print(".")
-                        time.sleep(1)
-            geocode.calls = 0
-            df['location'] = df.apply(geocode, axis=1)
-        else:
-            df1=pd.read_csv(os.path.join(input_filepath, "geocoded-tweet.csv"),header=0)
+        df1=pd.read_csv(os.path.join(input_filepath, "geocoded-tweet.csv"),header=0)
 
         df2=df.groupby('lga', as_index=False).agg({'text':lambda x:' '.join(x)})
 
