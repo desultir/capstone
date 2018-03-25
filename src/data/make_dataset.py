@@ -26,6 +26,7 @@ from dotenv import find_dotenv, load_dotenv
 def main(input_filepath='../data/raw', output_filepath='../data/processed', by_location=False, geocode=False):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
+        check
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
