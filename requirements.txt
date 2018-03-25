@@ -1,4 +1,5 @@
 click
+pyshp
 xlrd
 nltk
 sklearn
