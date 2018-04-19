@@ -32,7 +32,6 @@ def load_nsw_shapes(input_filepath, filename="2016_LGA_SHAPE/LGA_2016_AUST"):
 def whichlga(tweetpoints, nswshapes, nswdf):
     #loop over 130 NSW LGAs and return a name or "None"
     #NB you get names from Census data which is 2016 - pre amalgamations
-    #test by whether in bounding box. If in two, go to shapes. If still in two, one with smaller bounding box
     output = []
     nums = []
     amalgamations = {'Botany Bay': 'Bayside',
@@ -48,7 +47,7 @@ def whichlga(tweetpoints, nswshapes, nswdf):
         for i, nswshape in enumerate(nswshapes):
             if point.within(nswshape):
                 found = i
-                clean_name = nswdf.iloc[found[0]].clean_name
+                clean_name = nswdf.iloc[found].clean_name
                 break
         if not found:
             for i, nswshape in enumerate(nswshapes):
@@ -83,9 +82,9 @@ def main(input_filepath, output_filepath):
     nswshapes, centroids, geojson, nswdf = load_nsw_shapes(input_filepath)
 
     tweetdf, tweetpoints = load_tweets(input_filepath)
-    output, found = whichlga(tweetpoints, nswshapes)
+    output, found = whichlga(tweetpoints, nswshapes, nswdf)
 
-    tweetdf.loc[tweetdf['lat'].notnull(),:]['lga'] = np.asarray(output)
+    tweetdf.loc[tweetdf['lat'].notnull(),'lga'] = np.asarray(output)
 
     tweetdf.to_csv(os.path.join(output_filepath,"tweets_w_lga.csv"))
 
