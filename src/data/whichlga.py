@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
 
+
+cache = {}
+
 def load_nsw_shapes(input_filepath, filename="2016_LGA_SHAPE/LGA_2016_AUST"):
     sf = shapefile.Reader(os.path.join(input_filepath,filename))
 
@@ -44,21 +47,25 @@ def whichlga(tweetpoints, nswshapes, nswdf):
     for point in tweetpoints:
         found = False
         distances = []
-        for i, nswshape in enumerate(nswshapes):
-            if point.within(nswshape):
-                found = i
-                clean_name = nswdf.iloc[found].clean_name
-                break
-        if not found:
+        if (point.x, point.y) in cache:
+            output.append(cache[(point.x, point.y)])
+        else:
             for i, nswshape in enumerate(nswshapes):
-                distances.append(point.distance(nswshape))
+                if point.within(nswshape):
+                    found = i
+                    clean_name = nswdf.iloc[found].clean_name
+                    break
+            if not found:
+                for i, nswshape in enumerate(nswshapes):
+                    distances.append(point.distance(nswshape))
+                    
+                #out on the water
+                clean_name = nswdf.iloc[np.argmin(np.asarray(distances))].clean_name
                 
-            #out on the water
-            clean_name = nswdf.iloc[np.argmin(np.asarray(distances))].clean_name
-            
-        if clean_name in amalgamations:
-            clean_name = amalgamations[clean_name]
-        output.append(clean_name)
+            if clean_name in amalgamations:
+                clean_name = amalgamations[clean_name]
+            output.append(clean_name)
+            cache[(point.x, point.y)] = clean_name
             
     return pd.Series(output), nums
             
