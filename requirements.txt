@@ -1,4 +1,5 @@
 click
+ipykernel
 emoji
 matplotlib
 pyshp
