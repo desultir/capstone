@@ -35,8 +35,8 @@ print(predictions, '\n')
 embeddings = model.embedd(tweets)
 print(embeddings, '\n')
 '''
-
-df21=pd.read_csv("C:/Users/u107939/Capstone/DataSet/project_data/tweets_w_lga.csv"\
+basedir = "../../data/clean"
+df21=pd.read_csv(
                  ,header=0)
 
 #type(df1)

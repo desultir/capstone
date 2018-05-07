@@ -1,4 +1,5 @@
 click
+git+https://github.com/erikavaris/tokenizer.git
 tensorflow
 html
 keras
