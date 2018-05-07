@@ -1,4 +1,7 @@
 click
+tensorflow
+html
+keras
 ipykernel
 emoji
 matplotlib
