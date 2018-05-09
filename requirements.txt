@@ -1,8 +1,9 @@
 click
+jupyter
+h5py
 git+https://github.com/erikavaris/tokenizer.git
-tensorflow
-html
-keras
+theano==0.9.0
+keras==1.1.0
 ipykernel
 emoji
 matplotlib

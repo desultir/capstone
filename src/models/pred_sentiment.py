@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 from emotion_predictor import EmotionPredictor
 
@@ -10,6 +11,7 @@ pd.options.display.width = 200          # don't break columns
 
 # Predictor for Ekman's emotions in multiclass setting.
 model = EmotionPredictor(classification='ekman', setting='mc', use_unison_model=True)
+print("Model loaded.")
 '''
 tweets = [
     "Watching the sopranos again from start to finish!",
@@ -35,8 +37,8 @@ print(predictions, '\n')
 embeddings = model.embedd(tweets)
 print(embeddings, '\n')
 '''
-basedir = "../../data/clean"
-df21=pd.read_csv(
+basedir = os.path.abspath("data/processed")
+df21=pd.read_csv(os.path.join(basedir, "filtered_trisma2018_w_lga.csv")
                  ,header=0)
 
 #type(df1)
@@ -48,6 +50,7 @@ df21=df21.loc[df21['lang'] == "en"]
 df21=df21.dropna(subset=['lat'])
 
 tweets= df21.text.tolist()
-tweets=tweets[:50]
+
 predictions = model.predict_classes(tweets)
+predictions.to_csv(os.path.join(basedir, "trisma2018_w_emotion.csv"))
 print(predictions, '\n')

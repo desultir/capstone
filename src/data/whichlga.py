@@ -2,7 +2,7 @@ import click
 import os, sys
 import logging
 import shapefile
-from shapely.geometry import shape, Point, mapping
+from shapely.geometry import shape, Point, mapping, Polygon
 import numpy as np
 import pandas as pd
 from dotenv import find_dotenv, load_dotenv
@@ -43,12 +43,19 @@ def whichlga(tweetpoints, nswshapes, nswdf):
                      'Western Plains Regional' : 'Dubbo Regional',
                      'Unincorporated NSW' : 'Unincorporated Far West'
                     }
+    # we need to double check tweets are actually in nsw
+    #rough NSW bounding box - reference https://data.gov.au/geoserver/nsw-state-boundary/wms?request=GetCapabilities
+    nsw_bb = Polygon([[140.999279200001,-35.52052802079999],[140.999279200001,-28.1570199879999],
+              [159.105444163417,-28.1570199879999],[159.105444163417,-37.5052802079999]])
     
     for point in tweetpoints:
         found = False
         distances = []
         if (point.x, point.y) in cache:
             output.append(cache[(point.x, point.y)])
+        elif not point.within(nsw_bb):
+            output.append("OutsideNSW")
+            cache[(point.x, point.y)] = "OutsideNSW"
         else:
             for i, nswshape in enumerate(nswshapes):
                 if point.within(nswshape):
@@ -72,8 +79,9 @@ def whichlga(tweetpoints, nswshapes, nswdf):
 
 def load_tweets(input_filepath, filename='tweet.csv'):
     ''' load a csv twitter dataset; trim to those with lat/lng'''
-    tweetdf =pd.read_csv(os.path.join(input_filepath, "tweet.csv"),header=0)
+    tweetdf = pd.read_csv(os.path.join(input_filepath, "twitter_australia_loc_2018.csv"), header=0)
     loctweetdf = tweetdf.loc[tweetdf['lat'].notnull(),:]
+    print("{0}/{1} tweets have lat lng".format(len(loctweetdf), len(tweetdf)))
     
     tweetpoints = []
 
@@ -83,8 +91,8 @@ def load_tweets(input_filepath, filename='tweet.csv'):
 
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True), default='./data/raw')
-@click.argument('output_filepath', type=click.Path(), default='./data/processed')
+@click.argument('input_filepath', type=click.Path(exists=True), default=os.path.abspath('./data/raw'))
+@click.argument('output_filepath', type=click.Path(), default=os.path.abspath('./data/processed'))
 def main(input_filepath, output_filepath):
     nswshapes, centroids, geojson, nswdf = load_nsw_shapes(input_filepath)
 
@@ -93,20 +101,7 @@ def main(input_filepath, output_filepath):
 
     tweetdf.loc[tweetdf['lat'].notnull(),'lga'] = np.asarray(output)
 
-    tweetdf.to_csv(os.path.join(output_filepath,"tweets_w_lga.csv"))
-
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    project_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
-
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
-
-    main()
+    tweetdf.to_csv(os.path.join(output_filepath,"trisma2018_w_lga.csv"))
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
