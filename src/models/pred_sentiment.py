@@ -1,7 +1,7 @@
 import pandas as pd
-import os
 
 from emotion_predictor import EmotionPredictor
+from datetime import datetime
 
 # Pandas presentation options
 pd.options.display.max_colwidth = 150   # show whole tweet's content
@@ -9,9 +9,10 @@ pd.options.display.width = 200          # don't break columns
 # pd.options.display.max_columns = 7      # maximal number of columns
 
 
+
+
 # Predictor for Ekman's emotions in multiclass setting.
 model = EmotionPredictor(classification='ekman', setting='mc', use_unison_model=True)
-print("Model loaded.")
 '''
 tweets = [
     "Watching the sopranos again from start to finish!",
@@ -37,9 +38,11 @@ print(predictions, '\n')
 embeddings = model.embedd(tweets)
 print(embeddings, '\n')
 '''
-basedir = os.path.abspath("data/processed")
-df21=pd.read_csv(os.path.join(basedir, "filtered_trisma2018_w_lga.csv")
+'''
+df21=pd.read_csv("C:/Users/u107939/Capstone/DataSet/project_data/tweets_w_lga.csv"\
                  ,header=0)
+
+
 
 #type(df1)
 #n_rows=df1.shape[0]
@@ -49,8 +52,16 @@ df21=pd.read_csv(os.path.join(basedir, "filtered_trisma2018_w_lga.csv")
 df21=df21.loc[df21['lang'] == "en"]
 df21=df21.dropna(subset=['lat'])
 
-tweets= df21.text.tolist()
+'''
 
+df21=pd.read_csv("C:/Users/u107939/Capstone/DataSet/project_data/2016_sentiment_sample.csv"\
+                 ,header=0,encoding = "ISO-8859-1")
+
+
+
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+tweets= df21.text.tolist()
+#tweets=tweets[:50]
 predictions = model.predict_classes(tweets)
-predictions.to_csv(os.path.join(basedir, "trisma2018_w_emotion.csv"))
-print(predictions, '\n')
+#print(predictions, '\n')
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
